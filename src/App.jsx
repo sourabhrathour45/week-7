@@ -1,44 +1,42 @@
-import { useContext, useState } from "react"
-import { CountContext } from "./context";
-import { Navigate } from "react-router-dom";
-
+import { useRecoilState, useRecoilValue, RecoilRoot, useSetRecoilState } from "recoil";
+import { countState } from "./store/atoms/count";
+import { evenSelectors } from "./store/atoms/count";
 
 function App() {
-  const [count, setCount] = useState(0);  
   // wrap anyone that wants to use the teleported value inside a provider
   // recoil, redux, Themes in mUI
   return (
-    <div>
-      <CountContext.Provider value={count}>
-        <Count setCount={setCount} />
-      </CountContext.Provider>
-    </div>
+    <RecoilRoot>
+      <Count />
+    </RecoilRoot>
   )
 }
 
-function Count({setCount}) {
+function Count() {
   return <div>
     <CountRenderer />
-    <Buttons setCount={setCount} />
+    <Buttons />
   </div>
 }
 
 function CountRenderer() {
-  const count = useContext(CountContext);
+  const count = useRecoilValue(countState);
+  const isEven = useRecoilValue(evenSelectors)
   return <div>
     {count}
+    {isEven && <h1>Even Count</h1>}
   </div>
 }
 
-function Buttons({setCount}) {
-  const count = useContext(CountContext);
+function Buttons() {
+  const setCount = useSetRecoilState(countState)
   return <div>
     <button onClick={() => {
-      setCount(count + 1)
+      setCount((count) => count + 1)
     }}>Increase</button>
 
     <button onClick={() => {
-      setCount(count - 1)
+      setCount((count) => count - 1)
     }}>Decrease</button>
   </div>
 }
